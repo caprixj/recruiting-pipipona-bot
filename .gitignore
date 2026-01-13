@@ -1,218 +1,68 @@
-# Byte-compiled / optimized / DLL files
+# --- Python Core ---
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
-build/
-develop-eggs/
+
+# --- Distribution / Poetry ---
+# We commit poetry.lock, but ignore build artifacts
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
+build/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+.eggs/
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# PEP 582
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
+# --- Environments (Strict Security) ---
+# Never commit virtual envs or secrets
 .env
-.venv
+.env.*
+!.env.example
+.venv/
 env/
 venv/
-ENV/
-env.bak/
-venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# --- Logs ---
+*.log
+logs/
 
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
+# --- Testing & Quality Assurance ---
+# Artifacts from Mypy, Ruff, and Pytest
 .mypy_cache/
-.dmypy.json
-dmypy.json
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
 
-# Pyre type checker
-.pyre/
-
-# PyCharm / IntelliJ IDEA
+# --- IDE Settings ---
+# PyCharm
 .idea/
 *.iml
 *.iws
 *.ipr
-out/
 
 # VS Code
 .vscode/
 *.code-workspace
 
-# Project-specific
-# Environment variables (keep .env.example)
-.env
-.env.local
-.env.*.local
-
-# Data exports (temporary files)
-data/exports/*
-!data/exports/.gitkeep
-
-# Database files
-*.db
-*.sqlite
+# --- Database & Docker ---
+# Ignore local volume data to prevent committing the database itself
+postgres_data/
 *.sqlite3
+*.db
 
-# Alembic
-# Keep versions/ directory but ignore specific migration files if needed
-# alembic/versions/*.py  # Uncomment if you don't want to track migrations
+# --- Project Specific ---
+# Temporary output from utility scripts
+scripts/output/
 
-# Docker
-.dockerignore
-
-# OS-specific
+# --- OS Specific ---
 # macOS
 .DS_Store
 .AppleDouble
 .LSOverride
-Icon
-._*
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
 
 # Windows
 Thumbs.db
-Thumbs.db:encryptable
 ehthumbs.db
-ehthumbs_vista.db
-*.stackdump
 [Dd]esktop.ini
 $RECYCLE.BIN/
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-*.lnk
-
-# Linux
-*~
-.fuse_hidden*
-.directory
-.Trash-*
-.nfs*
-
-# Logs
-*.log
-logs/
-
-# Temporary files
-*.tmp
-*.temp
-*.swp
-*.swo
-*~
-
-# Excel temporary files
-~$*.xlsx
-~$*.xls
-
-# Backup files
-*.bak
-*.backup
-

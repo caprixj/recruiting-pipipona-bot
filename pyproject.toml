@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "recruiting-pipipona-bot"
+version = "0.1.0"
+description = "A high-performance, asynchronous backend for automating the initial stages of candidate recruitment via Telegram."
+authors = ["capri <capricavoid7@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.15"
+sqlalchemy = "^2.0"
+asyncpg = "^0.31.0"
+pydantic-settings = "^2.0"
+redis = "^7.0"
+pyyaml = "^6.0"
+alembic = "^1.13"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.14"
+black = "^25.12"
+mypy = "^1.8"
+pre-commit = "^4.5"
+tzdata = "^2025.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# Configuration for Tools
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+
+[tool.ruff]
+cache-dir = ".ruff_cache"
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+# Enable Pyflakes (F), pycodestyle (E, W), isort (I), and pydocstyle (D)
+select = ["F", "E", "W", "I", "D"]
+# Ignore missing docstrings in public modules/packages (optional)
+ignore = ["D100", "D104"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"  # Enforces Google Style Docstrings
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["sqlalchemy.ext.mypy.plugin"]

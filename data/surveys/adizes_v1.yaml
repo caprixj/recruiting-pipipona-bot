@@ -1,0 +1,20 @@
+type: ADIZES
+description: "Standard PAEI Short Demo"
+
+# Scoring logic:
+# High/Low thresholds determine capitalization (P vs p vs -)
+thresholds:
+  high: 10  # Scaled down for 5 questions (Max score possible = 12)
+  low: 4
+
+# Matrix: Maps Options (A/B/C/D) to Traits (P/A/E/I) for each question.
+# P = Producer, A = Administrator, E = Entrepreneur, I = Integrator
+matrix:
+  # Q1: Decision
+  1: { A: "P", B: "A", C: "E", D: "I" }
+
+  # Q2: Conflict
+  2: { A: "P", B: "A", C: "E", D: "I" }
+
+  # Q3: Planning
+  3: { A: "P", B: "A", C: "E", D: "I" }

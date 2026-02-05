@@ -6,14 +6,14 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-# Must import all models here so Alembic can "see" them
-from src.models.employee import Employee  # noqa: F401
-from src.models.survey_session import SurveySession  # noqa: F401
-
 # 1. Import Project Settings & Models
 # We add the root path to sys.path if necessary, but poetry usually handles it.
 from src.configs.env_settings import Settings
 from src.models.base import Base
+
+# Must import all models here so Alembic can "see" them
+from src.models.employee import Employee  # noqa: F401
+from src.models.survey_session import SurveySession  # noqa: F401
 
 # 2. Configuration
 config = context.config

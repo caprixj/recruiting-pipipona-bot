@@ -1,7 +1,5 @@
-from fast_depends import Depends, inject
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.dependencies import get_db_session, get_employee_repo
 from src.models.employee import Employee
 from src.repositories.employee_repository import EmployeeRepository
 
@@ -12,17 +10,16 @@ class EmployeeService:
     Orchestrates the lifecycle of candidate profiles, ensuring transactional integrity.
     """
 
-    @inject
     def __init__(
         self,
-        repo: EmployeeRepository = Depends(get_employee_repo),
-        session: AsyncSession = Depends(get_db_session),
+        repo: EmployeeRepository,
+        session: AsyncSession,
     ) -> None:
         """Initialize the service with dependencies.
 
         Args:
-            repo: The Employee Data Access Object.
-            session: The active database session for transaction management.
+            repo (EmployeeRepository): The Employee Data Access Object.
+            session (AsyncSession): The active database session for transaction management.
         """
         self.repo = repo
         self.session = session
@@ -36,11 +33,11 @@ class EmployeeService:
         3. Commits the transaction.
 
         Args:
-            tuid: Telegram User ID.
-            username: Telegram Username.
+            tuid (int): Telegram User ID.
+            username (str | None): Telegram Username.
 
         Returns:
-            The existing or newly created Employee entity.
+            Employee: The existing or newly created Employee entity.
         """
         existing_employee = await self.repo.find(tuid)
         if existing_employee:
@@ -53,6 +50,7 @@ class EmployeeService:
     async def update_profile(
         self,
         tuid: int,
+        username: str | None = None,
         full_name: str | None = None,
         phone: str | None = None,
         cv_link: str | None = None,
@@ -60,19 +58,21 @@ class EmployeeService:
         """Update candidate profile fields and commit changes.
 
         Args:
-            tuid: Telegram User ID.
-            full_name: Candidate's full name.
-            phone: Candidate's phone number.
-            cv_link: Link to the candidate's CV.
+            tuid (int): Telegram User ID.
+            username (str | None): Telegram Username.
+            full_name (str | None): Candidate's full name.
+            phone (str | None): Candidate's phone number.
+            cv_link (str | None): Link to the candidate's CV.
 
         Returns:
-            The updated Employee entity.
+            Employee: The updated Employee entity.
 
         Raises:
             EmployeeNotFoundError: If the employee does not exist.
         """
-        # The repo.update method handles the lookup and flushing.
-        updated_employee = await self.repo.update(tuid, full_name=full_name, phone=phone, cv_link=cv_link)
+        updated_employee = await self.repo.update(
+            tuid, username=username, full_name=full_name, phone=phone, cv_link=cv_link
+        )
         await self.session.commit()
         return updated_employee
 
@@ -80,12 +80,34 @@ class EmployeeService:
         """Retrieve an employee strictly, raising an error if missing.
 
         Args:
-            tuid: Telegram User ID.
+            tuid (int): Telegram User ID.
 
         Returns:
-            The Employee entity.
+            Employee: The Employee entity.
 
         Raises:
             EmployeeNotFoundError: If the employee does not exist.
         """
         return await self.repo.get(tuid)
+
+    async def get_language(self, tuid: int) -> str | None:
+        """Retrieve the preferred language for an employee.
+
+        Args:
+            tuid (int): Telegram User ID.
+
+        Returns:
+            str | None: The language code (e.g., 'ru', 'en') or None if unknown.
+        """
+        return await self.repo.get_language(tuid)
+
+    async def employee_exists(self, tuid: int) -> bool:
+        """Check if an employee exists.
+
+        Args:
+            tuid (int): Telegram User ID.
+
+        Returns:
+            bool: True if the employee exists, False otherwise.
+        """
+        return await self.repo.exists(tuid)

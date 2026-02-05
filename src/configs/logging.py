@@ -9,7 +9,11 @@ from src.configs.env_settings import Settings
 def setup_logging(settings: Settings) -> None:
     """Configures application-wide logging.
 
-    Dependent on the Settings object passed from main.py.
+    Dependent on the Settings object passed from main.py. Sets up console logging,
+    daily rotating file logging for all messages, and a separate error log file.
+
+    Args:
+        settings (Settings): Application settings containing LOG_LEVEL.
     """
     LOG_DIR = "logs"
     os.makedirs(LOG_DIR, exist_ok=True)

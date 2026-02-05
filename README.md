@@ -1,41 +1,46 @@
-# Telegram Recruiting Bot
+# Telegram Recruiting Bot (MVP)
 
-A high-performance, asynchronous backend for automating the initial stages of candidate recruitment via Telegram. This phase focuses on the **Adizes Management Style Test** to identify candidate profiles (Producer, Administrator, Entrepreneur, Integrator).
+An asynchronous recruiting automation tool designed to streamline candidate screening. This system administers the *
+*Adizes Management Style (PAEI)** assessment, enforcing strict session integrity and structured data collection via a
+modular "Survey Engine" architecture.
 
-## ℹ️ Purpose
+## ℹ️ Core Functionality
 
-To streamline the candidate screening process by capturing applicant data and evaluating their management style through an interactive, ranking-based assessment.
+* **Domain:** Automated candidate screening and PAEI profiling (Producer, Administrator, Entrepreneur, Integrator).
+* **Architecture:** Layered Service-Repository pattern with Hexagonal influences, ensuring separation between the UI (
+  Aiogram), Business Logic (Services), and Persistence (PostgreSQL).
 
 ## ✨ Key Features
 
-* **Automated Onboarding:** Structured collection of candidate name, phone number, and resume links with validation.
-* **Interactive Adizes Test:** * Dynamic ranking UI (unique 1-4 assignment).
-* Auto-advance logic upon question completion.
-* Real-time scoring of **P, A, E, and I** dimensions.
+### 👤 Candidate Onboarding
 
+* **Structured Profiling:** Guided finite state machine (FSM) flow for collecting Name, Phone (validated), and Resume
+  links.
+* **Idempotency:** logic ensures `Employee` entities are updated rather than duplicated during re-onboarding.
+* **UI Hygiene:** Enforces a single active keyboard state to prevent interface clutter.
 
-* **Admin Reporting:** Secure `/export` command that generates an `.xlsx` report of all candidates and their test results.
-* **Data Integrity:** PostgreSQL as the source of truth for all profiles and survey results using `JSONB` for flexible data storage.
-* **Localization:** Built-in I18n support for multiple languages.
+### 📊 Adizes Assessment Engine
+
+* **Ranking Logic:** Implements the 1-to-4 strict ranking system (no ties allowed).
+* **State Integrity & Concurrency:**
+* **Message Locking:** Decorator-based guard prevents race conditions and interactions with outdated UI elements ("
+  anti-time travel").
+* **Collision Handling:** Detects interrupted or abandoned sessions, offering context-aware options to Resume or
+  Restart.
+* **Scoring:** Immediate calculation of PAEI classification upon completion.
+
+### 🛡 Admin & Infrastructure
+
+* **Data Export:** `/export` command generates timestamped `.xlsx` reports via OpenPyXL.
+* **Schema Flexibility:** Utilizes PostgreSQL `JSONB` for survey answers, allowing survey structures to evolve without
+  strict schema migrations.
 
 ## 🛠 Tech Stack
 
-* **Language:** Python 3.12
-
-
-* **Frameworks:**
-* `Aiogram 3` (Bot Logic)
-* `FastAPI` (Lifecycle & Web Server)
-
-
-* **Database & State:**
-* `PostgreSQL` (Data & Persistence)
-* `SQLAlchemy 2.0` (Async ORM)
-* `Redis` (FSM & Caching)
-
-
-* **Tools:**
-* `Alembic` (Migrations)
-* `OpenPyXL` (Excel Generation)
-* `Pydantic` (Config)
-* `Docker` (Containerization)
+* **Runtime:** Python 3.12
+* **Framework:** Aiogram 3.x (Async)
+* **Persistence:**
+* **Database:** PostgreSQL (Asyncpg)
+* **ORM:** SQLAlchemy 2.0 (Declarative) + Alembic
+* **State Storage:** MemoryStorage (MVP configuration)
+* **Distribution:** Docker / Docker Compose

@@ -1,4 +1,4 @@
-from sqlalchemy import select, update
+from sqlalchemy import select, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import EmployeeNotFoundError
@@ -15,7 +15,7 @@ class EmployeeRepository:
         """Initialize the repository with a database session.
 
         Args:
-            session: The active SQLAlchemy AsyncSession.
+            session (AsyncSession): The active SQLAlchemy AsyncSession.
         """
         self.session = session
 
@@ -23,10 +23,10 @@ class EmployeeRepository:
         """Fetch an employee by their Telegram User ID (PK).
 
         Args:
-            tuid: The Telegram User ID.
+            tuid (int): The Telegram User ID.
 
         Returns:
-            The Employee model instance.
+            Employee: The Employee model instance.
 
         Raises:
             EmployeeNotFoundError: If the employee does not exist.
@@ -44,10 +44,10 @@ class EmployeeRepository:
         """Fetch an employee by their Telegram User ID (PK).
 
         Args:
-            tuid: The Telegram User ID.
+            tuid (int): The Telegram User ID.
 
         Returns:
-            The Employee model instance or None if it does not exist.
+            Employee | None: The Employee model instance or None if it does not exist.
         """
         stmt = select(Employee).where(Employee.tuid == tuid)
         result = await self.session.execute(stmt)
@@ -62,11 +62,11 @@ class EmployeeRepository:
             for committing.
 
         Args:
-            tuid: The Telegram User ID.
-            username: The Telegram username (optional).
+            tuid (int): The Telegram User ID.
+            username (str | None): The Telegram username (optional).
 
         Returns:
-            The newly created Employee instance.
+            Employee: The newly created Employee instance.
         """
         employee = Employee(tuid=tuid, username=username)
         self.session.add(employee)
@@ -76,6 +76,7 @@ class EmployeeRepository:
     async def update(
         self,
         tuid: int,
+        username: str | None = None,
         full_name: str | None = None,
         phone: str | None = None,
         cv_link: str | None = None,
@@ -83,18 +84,21 @@ class EmployeeRepository:
         """Update specific profile fields for an employee.
 
         Args:
-            tuid: The Telegram User ID.
-            full_name: The candidate's full name.
-            phone: The candidate's phone number.
-            cv_link: Link to the candidate's CV/Resume.
+            tuid (int): The Telegram User ID.
+            username (str | None): Telegram Username.
+            full_name (str | None): The candidate's full name.
+            phone (str | None): The candidate's phone number.
+            cv_link (str | None): Link to the candidate's CV/Resume.
 
         Returns:
-            The updated Employee instance.
+            Employee: The updated Employee instance.
 
         Raises:
             EmployeeNotFoundError: If the employee does not exist.
         """
         values_to_update = {}
+        if username is not None:
+            values_to_update["username"] = username
         if full_name is not None:
             values_to_update["full_name"] = full_name
         if phone is not None:
@@ -114,3 +118,29 @@ class EmployeeRepository:
             raise EmployeeNotFoundError(f"Employee {tuid} not found")
 
         return employee
+
+    async def get_language(self, tuid: int) -> str | None:
+        """Fetch the preferred language code for an employee.
+
+        Args:
+            tuid (int): The Telegram User ID.
+
+        Returns:
+            str | None: The language code (e.g., 'ru', 'en') or None if user not found.
+        """
+        stmt = select(Employee.language_code).where(Employee.tuid == tuid)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def exists(self, tuid: int) -> bool:
+        """Check if an employee exists by their Telegram User ID.
+
+        Args:
+            tuid (int): The Telegram User ID.
+
+        Returns:
+            bool: True if the employee exists, False otherwise.
+        """
+        stmt = select(exists().where(Employee.tuid == tuid))
+        result = await self.session.execute(stmt)
+        return result.scalar_one() is True

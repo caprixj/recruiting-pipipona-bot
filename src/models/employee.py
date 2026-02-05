@@ -12,6 +12,17 @@ class Employee(Base):
 
     Profile fields are nullable to allow creating the row on /start
     before the onboarding survey is complete.
+
+    Attributes:
+        tuid (int): Telegram user ID, used as the primary key.
+        username (Optional[str]): Telegram username.
+        full_name (Optional[str]): Full name of the candidate.
+        phone (Optional[str]): Contact phone number.
+        cv_link (Optional[str]): Link to the candidate's CV.
+        language_code (str): Preferred language for the bot interface (default: "ru").
+        created_at (datetime): Timestamp when the record was created.
+        updated_at (Optional[datetime]): Timestamp when the record was last updated.
+        sessions (List[SurveySession]): List of survey sessions associated with the employee.
     """
 
     __tablename__ = "employees"
@@ -27,7 +38,7 @@ class Employee(Base):
     cv_link: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     # Settings
-    language_code: Mapped[str] = mapped_column(String, default="en", nullable=False)
+    language_code: Mapped[str] = mapped_column(String, default="ru", nullable=False)
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -39,5 +50,9 @@ class Employee(Base):
     )
 
     def __repr__(self) -> str:
-        """Returns a string representation of the Employee."""
+        """Returns a string representation of the Employee.
+
+        Returns:
+            str: Representation containing tuid and username.
+        """
         return f"<Employee(tuid={self.tuid}, username={self.username})>"

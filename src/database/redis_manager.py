@@ -7,10 +7,10 @@ def get_redis_client(settings: Settings) -> Redis:
     """Creates an asynchronous Redis client based on provided settings.
 
     Args:
-        settings: The application configuration object.
+        settings (Settings): The application configuration object.
 
     Returns:
-        An instance of redis.asyncio.Redis.
+        Redis: An instance of redis.asyncio.Redis.
     """
     return Redis.from_url(
         settings.REDIS_URL,

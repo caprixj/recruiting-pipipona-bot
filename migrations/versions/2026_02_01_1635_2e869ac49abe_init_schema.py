@@ -1,8 +1,8 @@
-"""init_schema
+"""init_schema.
 
-Revision ID: 423e2ee4ca37
+Revision ID: 2e869ac49abe
 Revises:
-Create Date: 2026-01-13 20:49:58.039124+00:00
+Create Date: 2026-02-01 16:35:38.134820+00:00
 
 """
 
@@ -13,7 +13,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "423e2ee4ca37"
+revision: str = "2e869ac49abe"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,6 +38,7 @@ def upgrade() -> None:
         "survey_sessions",
         sa.Column("session_id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("employee_id", sa.BigInteger(), nullable=False),
+        sa.Column("survey_key", sa.String(), nullable=False),
         sa.Column("survey_type", sa.Enum("ADIZES", name="surveytype", native_enum=False), nullable=False),
         sa.Column(
             "status",

@@ -8,3 +8,7 @@ class EmployeeNotFoundError(RecruitingBotError):
 
 class SurveySessionNotFoundError(RecruitingBotError):
     """Raised when a survey session record cannot be found in the database."""
+
+
+class SurveyConfigError(RecruitingBotError):
+    """Raised when a survey configuration cannot be loaded."""

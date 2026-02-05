@@ -20,10 +20,10 @@ def setup_database(
     """Initialize the PostgreSQL Async Engine and Session Factory.
 
     Args:
-        settings: The application configuration object.
+        settings (Settings): The application configuration object.
 
     Returns:
-        A tuple containing the AsyncEngine and the async_sessionmaker.
+        tuple[AsyncEngine, async_sessionmaker[AsyncSession]]: A tuple containing the AsyncEngine and the async_sessionmaker.
     """
     global _session_maker
 
@@ -50,7 +50,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """Dependency Generator that yields a database session.
 
     Yields:
-        An active AsyncSession.
+        AsyncSession: An active AsyncSession.
 
     Raises:
         RuntimeError: If setup_database() has not been called yet.

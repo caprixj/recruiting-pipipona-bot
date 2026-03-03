@@ -1,3 +1,4 @@
+import logging
 from sqlalchemy import select, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -5,6 +6,7 @@ from src.core.exceptions import EmployeeNotFoundError
 from src.models.employee import Employee
 
 
+logger = logging.getLogger(__name__)
 class EmployeeRepository:
     """Data Access Layer for Employee entities.
 
@@ -36,6 +38,7 @@ class EmployeeRepository:
         employee = result.scalar_one_or_none()
 
         if not employee:
+            logger.warning(f"Employee {tuid} not found")
             raise EmployeeNotFoundError(f"Employee {tuid} not found")
 
         return employee
@@ -115,6 +118,7 @@ class EmployeeRepository:
         employee = result.scalar_one_or_none()
 
         if not employee:
+            logger.warning(f"Employee {tuid} not found during update")
             raise EmployeeNotFoundError(f"Employee {tuid} not found")
 
         return employee

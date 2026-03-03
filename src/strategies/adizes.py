@@ -1,7 +1,10 @@
+import logging
 from typing import Any, Dict
 
 from src.core.interfaces.survey_strategy import ISurveyStrategy, QuestionData
 from src.models.enums import InputType
+
+logger = logging.getLogger(__name__)
 
 
 class AdizesStrategy(ISurveyStrategy):
@@ -50,6 +53,7 @@ class AdizesStrategy(ISurveyStrategy):
             ValueError: If step is negative.
         """
         if step < 0:
+            logger.error(f"Negative step requested in AdizesStrategy: {step}")
             raise ValueError(f"Step {step} cannot be negative.")
 
         # Question IDs standardly start at 1, while steps start at 0

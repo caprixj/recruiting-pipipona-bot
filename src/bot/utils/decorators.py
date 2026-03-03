@@ -1,9 +1,12 @@
+import logging
 from collections.abc import Awaitable, Callable
 from functools import wraps
 from typing import ParamSpec, TypeVar
 
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+
+logger = logging.getLogger(__name__)
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -67,12 +70,14 @@ def require_message_lock(handler: Callable[P, Awaitable[R]]) -> Callable[P, Awai
         if event is None or state is None or i18n is None:
             found_kwargs = {k: type(v).__name__ for k, v in kwargs.items()}
             found_args = [type(a).__name__ for a in args]
-            raise RuntimeError(
+            error_msg = (
                 "@require_message_lock failed. Missing dependencies.\n"
                 f"Found Kwargs: {found_kwargs}\n"
                 f"Found Args: {found_args}\n"
                 "Required: `CallbackQuery`, `FSMContext`, and `i18n`."
             )
+            logger.critical(error_msg)
+            raise RuntimeError(error_msg)
 
         # 5. Message Validation
         if not isinstance(event.message, Message):
@@ -84,6 +89,10 @@ def require_message_lock(handler: Callable[P, Awaitable[R]]) -> Callable[P, Awai
         valid_msg_id: int | None = data.get("current_msg_id")
 
         if valid_msg_id is not None and event.message.message_id != valid_msg_id:
+            logger.warning(
+                f"Stale message interaction for user {event.from_user.id}: "
+                f"received msg_id={event.message.message_id}, expected msg_id={valid_msg_id}"
+            )
             await event.answer(i18n("testing.error_old_message"), show_alert=True)
             return None
 

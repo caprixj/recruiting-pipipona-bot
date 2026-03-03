@@ -1,3 +1,4 @@
+import logging
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,6 +7,7 @@ from src.models.enums import SurveyStatus, SurveyType
 from src.models.survey_session import SurveySession
 
 
+logger = logging.getLogger(__name__)
 class SurveyRepository:
     """Data Access Layer for SurveySession entities.
 
@@ -84,6 +86,7 @@ class SurveyRepository:
         session_entry = result.scalar_one_or_none()
 
         if not session_entry:
+            logger.warning(f"Survey session {session_id} not found during update_progress")
             raise SurveySessionNotFoundError(f"Session {session_id} not found")
 
         return session_entry
@@ -111,6 +114,7 @@ class SurveyRepository:
         session_entry = result.scalar_one_or_none()
 
         if not session_entry:
+            logger.warning(f"Survey session {session_id} not found during complete")
             raise SurveySessionNotFoundError(f"Session {session_id} not found")
 
         return session_entry
@@ -197,6 +201,7 @@ class SurveyRepository:
         session_entry = result.scalar_one_or_none()
 
         if not session_entry:
+            logger.warning(f"Survey session {session_id} not found during set_waiting_for_confirmation")
             raise SurveySessionNotFoundError(f"Session {session_id} not found")
 
         return session_entry

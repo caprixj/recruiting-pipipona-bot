@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Any, Dict
 
@@ -5,6 +6,8 @@ import yaml
 from yaml import YAMLError
 
 from src.core.exceptions import SurveyConfigError
+
+logger = logging.getLogger(__name__)
 
 
 class SurveyConfigService:
@@ -42,6 +45,7 @@ class SurveyConfigService:
         file_path = self._base_dir / f"{survey_key}.yaml"
 
         if not file_path.exists():
+            logger.error(f"Configuration file for '{survey_key}' not found at {file_path}")
             raise SurveyConfigError(f"Configuration file for '{survey_key}' not found at {file_path}")
 
         # Load and parse YAML
@@ -54,6 +58,8 @@ class SurveyConfigService:
             return config
 
         except YAMLError as e:
+            logger.exception(f"Invalid YAML in configuration '{survey_key}': {e}")
             raise SurveyConfigError(f"Invalid YAML in configuration '{survey_key}': {e}")
         except Exception as e:
+            logger.exception(f"Unexpected error loading config '{survey_key}': {e}")
             raise SurveyConfigError(f"Unexpected error loading config '{survey_key}': {e}")

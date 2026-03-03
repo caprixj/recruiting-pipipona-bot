@@ -1,3 +1,4 @@
+import logging
 from typing import Callable, List
 
 from aiogram import F, Router
@@ -21,6 +22,8 @@ from src.services.employee_service import EmployeeService
 from src.services.survey_service import SurveyService
 
 router = Router(name="testing")
+
+logger = logging.getLogger(__name__)
 
 # Router-level filter: These handlers must only work in private chats
 router.message.filter(F.chat.type == "private")
@@ -420,7 +423,8 @@ async def _start_new_test_flow(
             survey_key=survey_key,
         )
         await _send_current_question(message, state, i18n, survey_service, emp_service)
-    except ValueError:
+    except ValueError as e:
+        logger.warning(f"Session conflict for user {message.chat.id}: {e}")
         await message.answer(i18n("testing.error_session_conflict"))
 
 
@@ -464,6 +468,7 @@ async def _submit_answer_and_next(
             answer=answer,
         )
     except ValueError as e:
+        logger.error(f"Invalid answer for user {callback.from_user.id}: {e}")
         await callback.answer(f"Error: {e}", show_alert=True)
         return
 
@@ -503,7 +508,8 @@ async def _send_current_question(
             raise SurveySessionNotFoundError(f"No active session for user {message.chat.id}")
 
         q_data = await survey_service.get_question_data(message.chat.id)
-    except SurveySessionNotFoundError:
+    except SurveySessionNotFoundError as e:
+        logger.warning(f"Session not found for user {message.chat.id}: {e}")
         # Should not happen in normal flow, but good for safety
         if message.reply_markup:
             await message.edit_reply_markup(reply_markup=None)
@@ -580,7 +586,8 @@ async def _validate_survey_control_callback(
 
     try:
         callback_session_id = int(parts[1])
-    except (ValueError, IndexError):
+    except (ValueError, IndexError) as e:
+        logger.error(f"Invalid callback data format '{callback.data}': {e}")
         await callback.answer(i18n("testing.session_no_longer_active"), show_alert=True)
         return None
 
@@ -622,7 +629,8 @@ async def _validate_survey_option_callback(
     try:
         callback_session_id = int(parts[1])
         option = parts[2]
-    except (ValueError, IndexError):
+    except (ValueError, IndexError) as e:
+        logger.error(f"Invalid callback data format '{callback.data}': {e}")
         await callback.answer(i18n("testing.session_no_longer_active"), show_alert=True)
         return None
 

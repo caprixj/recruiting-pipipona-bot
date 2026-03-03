@@ -1,3 +1,4 @@
+import logging
 from typing import Callable
 
 from aiogram import F, Router
@@ -10,6 +11,8 @@ from src.services.employee_service import EmployeeService
 from src.services.survey_service import SurveyService
 
 router = Router(name="profile")
+
+logger = logging.getLogger(__name__)
 
 # Router-level filter: private chats only
 router.message.filter(F.chat.type == "private")
@@ -59,9 +62,11 @@ async def on_profile_confirm(
 
     except ValueError as e:
         # Business logic errors (e.g., session already finished, incomplete data)
+        logger.error(f"Business logic error during profile confirmation for user {callback.from_user.id}: {e}")
         await callback.answer(i18n("profile.error_value", error=str(e)), show_alert=True)
         return
     except Exception as e:
+        logger.exception(f"Unexpected error during profile confirmation for user {callback.from_user.id}: {e}")
         await callback.answer(i18n("profile.error_generic", error=str(e)), show_alert=True)
         return
 

@@ -1,3 +1,4 @@
+import logging
 from typing import Callable
 
 from aiogram import F, Router
@@ -22,6 +23,8 @@ from src.services.employee_service import EmployeeService
 from src.services.survey_service import SurveyService
 
 router = Router(name="onboarding")
+
+logger = logging.getLogger(__name__)
 
 
 @router.message(Command("onboard"))
@@ -248,7 +251,8 @@ async def process_cv(
         # Fetch latest employee data from DB
         try:
             employee = await emp_service.get_employee(message.chat.id)
-        except EmployeeNotFoundError:
+        except EmployeeNotFoundError as e:
+            logger.warning(f"Employee {message.chat.id} not found during onboarding resumption: {e}")
             # Fallback: clear state and show standard message
             await state.clear()
             kb = InlineKeyboardMarkup(

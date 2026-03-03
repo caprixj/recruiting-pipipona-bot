@@ -1,9 +1,11 @@
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.employee import Employee
 from src.repositories.employee_repository import EmployeeRepository
 
 
+logger = logging.getLogger(__name__)
 class EmployeeService:
     """Business Logic Layer for Employee Management.
 

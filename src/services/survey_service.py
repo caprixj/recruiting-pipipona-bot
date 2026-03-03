@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,6 +12,7 @@ from src.services.survey_config_service import SurveyConfigService
 from src.strategies import get_strategy
 
 
+logger = logging.getLogger(__name__)
 class SurveyService:
     """Business Logic Layer for Survey Management.
 
@@ -96,6 +98,7 @@ class SurveyService:
         """
         active = await self.repo.get_active(tuid)
         if active:
+            logger.warning(f"User {tuid} already has an active session. Abandon it first.")
             raise ValueError(f"User {tuid} already has an active session. Abandon it first.")
 
         # Clean up any stale WAITING_FOR_CONFIRMATION sessions
@@ -122,6 +125,7 @@ class SurveyService:
         """
         session = await self.repo.get_active(tuid)
         if not session:
+            logger.warning(f"No active session for user {tuid} when getting question data")
             raise SurveySessionNotFoundError(f"No active session for user {tuid}")
 
         # Load Strategy & Config
@@ -157,11 +161,13 @@ class SurveyService:
         """
         session = await self.repo.get_active(tuid)
         if not session:
+            logger.warning(f"No active session for user {tuid} when saving answer")
             raise SurveySessionNotFoundError(f"No active session for user {tuid}")
 
         # Validation
         strategy = get_strategy(session.survey_type)
         if not strategy.validate_answer(step, answer):
+            logger.error(f"Invalid answer format for user {tuid}, step {step}")
             raise ValueError(f"Invalid answer format for step {step}")
 
         # Update State (Safe Copy)
@@ -206,6 +212,7 @@ class SurveyService:
         """
         session = await self.repo.get_active(tuid)
         if not session:
+            logger.warning(f"No active session for user {tuid} when setting waiting for confirmation")
             raise SurveySessionNotFoundError(f"No active session for user {tuid}")
 
         updated_session = await self.repo.set_waiting_for_confirmation(session.session_id)
@@ -234,6 +241,7 @@ class SurveyService:
             session = await self.repo.get_active(tuid)
 
         if not session:
+            logger.warning(f"No active session for user {tuid} when finishing survey")
             raise SurveySessionNotFoundError(f"No active session for user {tuid}")
 
         # Load Strategy & Config

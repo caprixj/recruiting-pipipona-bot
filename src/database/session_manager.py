@@ -1,3 +1,4 @@
+import logging
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
@@ -8,6 +9,8 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.configs.env_settings import Settings
+
+logger = logging.getLogger(__name__)
 
 # Global reference to the session factory.
 # Populated by setup_database() at runtime.
@@ -58,6 +61,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     global _session_maker
 
     if _session_maker is None:
+        logger.critical("Database not initialized. Call setup_database() first.")
         raise RuntimeError("Database not initialized. Call setup_database() first.")
 
     async with _session_maker() as session:
